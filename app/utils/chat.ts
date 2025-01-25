@@ -282,7 +282,7 @@ export function stream(
             console.debug("[ChatAPI] restart");
             running = false;
             chatApi(chatPath, headers, requestPayload, tools); // call fetchEventSource
-          }, 60);
+          }, 300);
         });
         return;
       }
