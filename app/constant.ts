@@ -109,7 +109,7 @@ export const UNFINISHED_INPUT = (id: string) => "unfinished-input-" + id;
 
 export const STORAGE_KEY = "chatgpt-next-web";
 
-export const REQUEST_TIMEOUT_MS = 60000;
+export const REQUEST_TIMEOUT_MS = 300000;
 
 export const EXPORT_MESSAGE_CLASS_NAME = "export-markdown";
 
