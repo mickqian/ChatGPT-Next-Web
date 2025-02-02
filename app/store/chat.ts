@@ -630,7 +630,7 @@ export const useChatStore = createPersistStore(
         }
         // concat all messages
         const recentMessages = [
-          ...systemPrompts,
+          // ...systemPrompts,
           ...longTermMemoryPrompts,
           ...contextPrompts,
           ...reversedRecentMessages.reverse(),
