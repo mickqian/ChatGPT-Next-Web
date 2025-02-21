@@ -109,7 +109,7 @@ export const UNFINISHED_INPUT = (id: string) => "unfinished-input-" + id;
 
 export const STORAGE_KEY = "chatgpt-next-web";
 
-export const REQUEST_TIMEOUT_MS = 300000;
+export const REQUEST_TIMEOUT_MS = 3000000;
 export const REQUEST_TIMEOUT_MS_FOR_THINKING = REQUEST_TIMEOUT_MS * 5;
 
 export const EXPORT_MESSAGE_CLASS_NAME = "export-markdown";
@@ -438,7 +438,7 @@ export const KnowledgeCutOffDate: Record<string, string> = {
   "o1-preview-2024-09-12": "2023-10",
   "o1-preview": "2023-10",
   "o1-2024-12-17": "2023-10",
-  "o1": "2023-10",
+  o1: "2023-10",
   "o3-mini-2025-01-31": "2023-10",
   "o3-mini": "2023-10",
   // After improvements,
