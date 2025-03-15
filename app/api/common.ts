@@ -27,6 +27,8 @@ export async function requestOpenai(req: NextRequest) {
     authHeaderName = "Authorization";
   }
 
+  console.log("[Url] ", req.nextUrl);
+
   let path = `${req.nextUrl.pathname}`.replaceAll("/api/openai/", "");
 
   let baseUrl =
@@ -87,6 +89,7 @@ export async function requestOpenai(req: NextRequest) {
       }
     }
   }
+  console.log("body", req.body);
 
   const fetchUrl = cloudflareAIGatewayUrl(`${baseUrl}/${path}`);
   console.log("fetchUrl", fetchUrl);
@@ -107,6 +110,8 @@ export async function requestOpenai(req: NextRequest) {
     duplex: "half",
     signal: controller.signal,
   };
+
+  console.log("[fetchOptions]", JSON.stringify(fetchOptions));
 
   // #1815 try to refuse gpt4 request
   if (serverConfig.customModels && req.body) {
