@@ -1,4 +1,6 @@
+// @ts-ignore
 import type { Config } from "jest";
+// @ts-ignore
 import nextJest from "next/jest.js";
 
 const createJestConfig = nextJest({

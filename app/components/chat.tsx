@@ -1221,6 +1221,8 @@ function _Chat() {
     // 3. delete original user input and bot's message
     // 4. resend the user's input
 
+    console.log("[message], ", message);
+
     const resendingIndex = session.messages.findIndex(
       (m) => m.id === message.id,
     );
@@ -1265,6 +1267,8 @@ function _Chat() {
     // resend the message
     setIsLoading(true);
     const textContent = getMessageTextContent(userMessage);
+    console.log("[textContent], ", textContent);
+
     const images = getMessageImages(userMessage);
     chatStore.onUserInput(textContent, images).then(() => setIsLoading(false));
     inputRef.current?.focus();

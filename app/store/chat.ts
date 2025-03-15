@@ -458,6 +458,7 @@ export const useChatStore = createPersistStore(
 
         const api: ClientApi = getClientApi(modelConfig.providerName);
         // make request
+        console.log("[Messages], ", sendMessages);
         api.llm.chat({
           messages: sendMessages,
           config: { ...modelConfig, stream: true },
@@ -705,6 +706,8 @@ export const useChatStore = createPersistStore(
                 content: Locale.Store.Prompt.Topic,
               }),
             );
+          console.log("[Messages], ", topicMessages);
+
           api.llm.chat({
             messages: topicMessages,
             config: {
@@ -763,6 +766,7 @@ export const useChatStore = createPersistStore(
            * this param is just shit
            **/
           const { max_tokens, ...modelcfg } = modelConfig;
+          console.log("[Messages], ", toBeSummarizedMsgs);
           api.llm.chat({
             messages: toBeSummarizedMsgs.concat(
               createMessage({

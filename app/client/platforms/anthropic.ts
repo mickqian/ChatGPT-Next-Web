@@ -172,6 +172,8 @@ export class ClaudeApi implements LLMApi {
         };
       });
 
+    console.log("[prompt], ", prompt);
+
     if (prompt[0]?.role === "assistant") {
       prompt.unshift({
         role: "user",

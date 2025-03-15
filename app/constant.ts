@@ -21,7 +21,8 @@ export const BAIDU_OATUH_URL = `${BAIDU_BASE_URL}/oauth/2.0/token`;
 
 export const BYTEDANCE_BASE_URL = "https://ark.cn-beijing.volces.com";
 
-export const ALIBABA_BASE_URL = "https://dashscope.aliyuncs.com/api/";
+// export const ALIBABA_BASE_URL = "https://dashscope.aliyuncs.com/api/";
+export const ALIBABA_BASE_URL = "https://dashscope.aliyuncs.com";
 
 export const TENCENT_BASE_URL = "https://hunyuan.tencentcloudapi.com";
 
@@ -221,13 +222,30 @@ export const ByteDance = {
 
 export const Alibaba = {
   ExampleEndpoint: ALIBABA_BASE_URL,
+  // ChatPath: (modelName: string) => {
+  //   if (modelName.includes("vl") || modelName.includes("omni")) {
+  //     return "v1/services/aigc/multimodal-generation/generation";
+  //   }
+  //   return `v1/services/aigc/text-generation/generation`;
+  // },
   ChatPath: (modelName: string) => {
-    if (modelName.includes("vl") || modelName.includes("omni")) {
-      return "v1/services/aigc/multimodal-generation/generation";
-    }
-    return `v1/services/aigc/text-generation/generation`;
+    // if (modelName.includes("vl") || modelName.includes("omni")) {
+    //   return "v1/services/aigc/multimodal-generation/generation";
+    // }
+    return "compatible-mode/v1/chat/completions";
   },
+  // ChatPath: "compatible-mode/v1/chat/completions",
 };
+
+// export const Alibaba = {
+//   ExampleEndpoint: ALIBABA_BASE_URL,
+//   ChatPath: (modelName: string) => {
+//     if (modelName.includes("vl") || modelName.includes("omni")) {
+//       return "v1/services/aigc/multimodal-generation/generation";
+//     }
+//     return `v1/services/aigc/text-generation/generation`;
+//   },
+// };
 
 export const Tencent = {
   ExampleEndpoint: TENCENT_BASE_URL,
@@ -505,6 +523,7 @@ const openaiModels = [
   "gpt-4.5-preview",
   "gpt-4.5-preview-2025-02-27",
   "gpt-4o",
+  "gpt-4.5-preview",
   // "gpt-4o-2024-05-13",
   // "gpt-4o-2024-08-06",
   // "gpt-4o-2024-11-20",
@@ -589,13 +608,14 @@ const bytedanceModels = [
 ];
 
 const alibabaModes = [
-  "qwen-turbo",
-  "qwen-plus",
-  "qwen-max",
-  "qwen-max-0428",
-  "qwen-max-0403",
-  "qwen-max-0107",
-  "qwen-max-longcontext",
+  "qwq-32b",
+  // "qwen-turbo",
+  // "qwen-plus",
+  // "qwen-max",
+  // "qwen-max-0428",
+  // "qwen-max-0403",
+  // "qwen-max-0107",
+  // "qwen-max-longcontext",
   "qwen-omni-turbo",
   "qwen-vl-plus",
   "qwen-vl-max",
@@ -750,17 +770,17 @@ export const DEFAULT_MODELS = [
   //     sorted: 6,
   //   },
   // })),
-  // ...alibabaModes.map((name) => ({
-  //   name,
-  //   available: true,
-  //   sorted: seq++,
-  //   provider: {
-  //     id: "alibaba",
-  //     providerName: "Alibaba",
-  //     providerType: "alibaba",
-  //     sorted: 7,
-  //   },
-  // })),
+  ...alibabaModes.map((name) => ({
+    name,
+    available: true,
+    sorted: seq++,
+    provider: {
+      id: "alibaba",
+      providerName: "Alibaba",
+      providerType: "alibaba",
+      sorted: 7,
+    },
+  })),
   // ...tencentModels.map((name) => ({
   //   name,
   //   available: true,

@@ -58,6 +58,8 @@ export async function handle(
     });
   }
 
+  console.log("[Url] ", req.nextUrl);
+
   try {
     const response = await requestOpenai(req);
 
