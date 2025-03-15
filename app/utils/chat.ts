@@ -175,6 +175,7 @@ export function stream(
   let running = false;
   let runTools: any[] = [];
   let responseRes: Response;
+  console.log("Streaming");
 
   // animate response to make it looks smooth
   function animateResponseText() {
@@ -285,6 +286,8 @@ export function stream(
     requestPayload: any,
     tools: any,
   ) {
+    console.log("chatapi");
+
     const chatPayload = {
       method: "POST",
       body: JSON.stringify({
@@ -520,6 +523,7 @@ export function streamWithThink(
       signal: controller.signal,
       headers,
     };
+    console.log("523");
     const requestTimeoutId = setTimeout(
       () => controller.abort(),
       REQUEST_TIMEOUT_MS,

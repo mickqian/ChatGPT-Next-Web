@@ -1,7 +1,6 @@
 import { getServerSideConfig } from "@/app/config/server";
 import {
   ALIBABA_BASE_URL,
-  ApiPath,
   ModelProvider,
   ServiceProvider,
 } from "@/app/constant";
@@ -38,12 +37,37 @@ export async function handle(
   }
 }
 
+async function printReadableStream(stream: ReadableStream<Uint8Array>) {
+  const reader = stream.getReader();
+  const decoder = new TextDecoder("utf-8");
+  let result = "";
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        break;
+      }
+      // 将 Uint8Array 转换为字符串并累加到结果中
+      result += decoder.decode(value, { stream: true });
+    }
+  } catch (error) {
+    console.error("Error reading stream:", error);
+  } finally {
+    reader.releaseLock();
+  }
+
+  console.log("Stream content:", result);
+}
+
 async function request(req: NextRequest) {
   const controller = new AbortController();
 
   // alibaba use base url or just remove the path
-  let path = `${req.nextUrl.pathname}`.replaceAll(ApiPath.Alibaba, "");
+  let Alibaba_PATH = "/api/alibaba/";
 
+  let path = `${req.nextUrl.pathname}`.replaceAll(Alibaba_PATH, "");
+  console.log("[Path] ", path);
   let baseUrl = serverConfig.alibabaUrl || ALIBABA_BASE_URL;
 
   if (!baseUrl.startsWith("http")) {
@@ -54,8 +78,10 @@ async function request(req: NextRequest) {
     baseUrl = baseUrl.slice(0, -1);
   }
 
+  console.log("[Url] ", req.nextUrl);
   console.log("[Proxy] ", path);
   console.log("[Base Url]", baseUrl);
+  // console.log("[Body]", req.body);
 
   const timeoutId = setTimeout(
     () => {
@@ -64,7 +90,8 @@ async function request(req: NextRequest) {
     10 * 60 * 1000,
   );
 
-  const fetchUrl = `${baseUrl}${path}`;
+  const fetchUrl = `${baseUrl}/${path}`;
+  console.log("[fetchUrl]", fetchUrl);
   const fetchOptions: RequestInit = {
     headers: {
       "Content-Type": "application/json",
@@ -79,11 +106,19 @@ async function request(req: NextRequest) {
     signal: controller.signal,
   };
 
+  // console.log(util.inspect(fetchOptions, { showHidden: true, depth: null, colors: true }));
+
+  // console.log("[fetchOptions]", JSON.stringify(fetchOptions));
+  // console.log("[req]", JSON.stringify(req));
+  // console.log("[serverConfig.customModels] ", serverConfig.customModels);
+
   // #1815 try to refuse some request to some models
   if (serverConfig.customModels && req.body) {
     try {
       const clonedBody = await req.text();
       fetchOptions.body = clonedBody;
+
+      console.log("104 [fetchOptions]", JSON.stringify(fetchOptions));
 
       const jsonBody = JSON.parse(clonedBody) as { model?: string };
 
@@ -110,6 +145,11 @@ async function request(req: NextRequest) {
     }
   }
   try {
+    console.log("[body]", JSON.stringify(fetchOptions.body));
+    // console.log("[body]", fetchOptions);
+
+    // printReadableStream(fetchOptions.body)
+
     const res = await fetch(fetchUrl, fetchOptions);
 
     // to prevent browser prompt for credentials

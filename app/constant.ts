@@ -21,7 +21,8 @@ export const BAIDU_OATUH_URL = `${BAIDU_BASE_URL}/oauth/2.0/token`;
 
 export const BYTEDANCE_BASE_URL = "https://ark.cn-beijing.volces.com";
 
-export const ALIBABA_BASE_URL = "https://dashscope.aliyuncs.com/api/";
+// export const ALIBABA_BASE_URL = "https://dashscope.aliyuncs.com/api/";
+export const ALIBABA_BASE_URL = "https://dashscope.aliyuncs.com";
 
 export const TENCENT_BASE_URL = "https://hunyuan.tencentcloudapi.com";
 
@@ -221,7 +222,8 @@ export const ByteDance = {
 
 export const Alibaba = {
   ExampleEndpoint: ALIBABA_BASE_URL,
-  ChatPath: "v1/services/aigc/text-generation/generation",
+  // ChatPath: "v1/services/aigc/text-generation/generation",
+  ChatPath: "compatible-mode/v1/chat/completions",
 };
 
 export const Tencent = {
@@ -481,6 +483,7 @@ const openaiModels = [
   // "gpt-4-turbo",
   // "gpt-4-turbo-preview",
   "gpt-4o",
+  "gpt-4.5-preview",
   // "gpt-4o-2024-05-13",
   // "gpt-4o-2024-08-06",
   // "gpt-4o-2024-11-20",
@@ -562,13 +565,14 @@ const bytedanceModels = [
 ];
 
 const alibabaModes = [
-  "qwen-turbo",
-  "qwen-plus",
-  "qwen-max",
-  "qwen-max-0428",
-  "qwen-max-0403",
-  "qwen-max-0107",
-  "qwen-max-longcontext",
+  "qwq-32b",
+  // "qwen-turbo",
+  // "qwen-plus",
+  // "qwen-max",
+  // "qwen-max-0428",
+  // "qwen-max-0403",
+  // "qwen-max-0107",
+  // "qwen-max-longcontext",
 ];
 
 const tencentModels = [
@@ -720,17 +724,17 @@ export const DEFAULT_MODELS = [
   //     sorted: 6,
   //   },
   // })),
-  // ...alibabaModes.map((name) => ({
-  //   name,
-  //   available: true,
-  //   sorted: seq++,
-  //   provider: {
-  //     id: "alibaba",
-  //     providerName: "Alibaba",
-  //     providerType: "alibaba",
-  //     sorted: 7,
-  //   },
-  // })),
+  ...alibabaModes.map((name) => ({
+    name,
+    available: true,
+    sorted: seq++,
+    provider: {
+      id: "alibaba",
+      providerName: "Alibaba",
+      providerType: "alibaba",
+      sorted: 7,
+    },
+  })),
   // ...tencentModels.map((name) => ({
   //   name,
   //   available: true,

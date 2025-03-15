@@ -39,6 +39,7 @@ interface RequestInput {
     content: string | MultimodalContent[];
   }[];
 }
+
 interface RequestParam {
   result_format: string;
   incremental_output?: boolean;
@@ -47,10 +48,20 @@ interface RequestParam {
   top_p: number;
   max_tokens?: number;
 }
-interface RequestPayload {
+
+export interface RequestPayload {
+  messages: {
+    role: "system" | "user" | "assistant";
+    content: string | MultimodalContent[];
+  }[];
+  stream?: boolean;
   model: string;
-  input: RequestInput;
-  parameters: RequestParam;
+  // temperature: number;
+  // presence_penalty: number;
+  // frequency_penalty: number;
+  // top_p: number;
+  // max_tokens?: number;
+  // max_completion_tokens?: number;
 }
 
 export class QwenApi implements LLMApi {
@@ -89,6 +100,8 @@ export class QwenApi implements LLMApi {
   }
 
   async chat(options: ChatOptions) {
+    console.log("[options], ", options);
+
     const messages = options.messages.map((v) => ({
       role: v.role,
       content:
@@ -108,16 +121,17 @@ export class QwenApi implements LLMApi {
     const shouldStream = !!options.config.stream;
     const requestPayload: RequestPayload = {
       model: modelConfig.model,
-      input: {
-        messages,
-      },
-      parameters: {
-        result_format: "message",
-        incremental_output: shouldStream,
-        temperature: modelConfig.temperature,
-        // max_tokens: modelConfig.max_tokens,
-        top_p: modelConfig.top_p === 1 ? 0.99 : modelConfig.top_p, // qwen top_p is should be < 1
-      },
+      // input: {
+      messages: messages,
+      // },
+      stream: shouldStream,
+      // parameters: {
+      //     result_format: "message",
+      //     incremental_output: shouldStream,
+      //     temperature: modelConfig.temperature,
+      //     // max_tokens: modelConfig.max_tokens,
+      //     top_p: modelConfig.top_p === 1 ? 0.99 : modelConfig.top_p, // qwen top_p is should be < 1
+      // },
     };
 
     const controller = new AbortController();
@@ -130,12 +144,6 @@ export class QwenApi implements LLMApi {
       };
 
       const chatPath = this.path(Alibaba.ChatPath);
-      const chatPayload = {
-        method: "POST",
-        body: JSON.stringify(requestPayload),
-        signal: controller.signal,
-        headers: headers,
-      };
 
       // make a fetch request
       const requestTimeoutId = setTimeout(
@@ -144,15 +152,16 @@ export class QwenApi implements LLMApi {
       );
 
       if (shouldStream) {
+        let index = -1;
         const [tools, funcs] = usePluginStore
           .getState()
           .getAsTools(
             useChatStore.getState().currentSession().mask?.plugin || [],
           );
-        return streamWithThink(
+        streamWithThink(
           chatPath,
           requestPayload,
-          headers,
+          getHeaders(),
           tools as any,
           funcs,
           controller,
@@ -160,38 +169,38 @@ export class QwenApi implements LLMApi {
           (text: string, runTools: ChatMessageTool[]) => {
             // console.log("parseSSE", text, runTools);
             const json = JSON.parse(text);
-            const choices = json.output.choices as Array<{
-              message: {
-                content: string | null;
-                tool_calls: ChatMessageTool[];
+            const choices = json.choices as Array<{
+              delta: {
+                content: string;
+                // tool_calls: ChatMessageTool[];
                 reasoning_content: string | null;
               };
             }>;
 
             if (!choices?.length) return { isThinking: false, content: "" };
 
-            const tool_calls = choices[0]?.message?.tool_calls;
-            if (tool_calls?.length > 0) {
-              const index = tool_calls[0]?.index;
-              const id = tool_calls[0]?.id;
-              const args = tool_calls[0]?.function?.arguments;
-              if (id) {
-                runTools.push({
-                  id,
-                  type: tool_calls[0]?.type,
-                  function: {
-                    name: tool_calls[0]?.function?.name as string,
-                    arguments: args,
-                  },
-                });
-              } else {
-                // @ts-ignore
-                runTools[index]["function"]["arguments"] += args;
-              }
-            }
+            // const tool_calls = choices[0]?.delta?.tool_calls;
+            // if (tool_calls?.length > 0) {
+            //     const id = tool_calls[0]?.id;
+            //     const args = tool_calls[0]?.function?.arguments;
+            //     if (id) {
+            //         index += 1;
+            //         runTools.push({
+            //             id,
+            //             type: tool_calls[0]?.type,
+            //             function: {
+            //                 name: tool_calls[0]?.function?.name as string,
+            //                 arguments: args,
+            //             },
+            //         });
+            //     } else {
+            //         // @ts-ignore
+            //         runTools[index]["function"]["arguments"] += args;
+            //     }
+            // }
 
-            const reasoning = choices[0]?.message?.reasoning_content;
-            const content = choices[0]?.message?.content;
+            const reasoning = choices[0]?.delta?.reasoning_content;
+            const content = choices[0]?.delta?.content;
 
             // Skip if both content and reasoning_content are empty or null
             if (
@@ -227,8 +236,12 @@ export class QwenApi implements LLMApi {
             toolCallMessage: any,
             toolCallResult: any[],
           ) => {
-            requestPayload?.input?.messages?.splice(
-              requestPayload?.input?.messages?.length,
+            // reset index value
+            index = -1;
+            // @ts-ignore
+            requestPayload?.messages?.splice(
+              // @ts-ignore
+              requestPayload?.messages?.length,
               0,
               toolCallMessage,
               ...toolCallResult,
@@ -237,6 +250,12 @@ export class QwenApi implements LLMApi {
           options,
         );
       } else {
+        const chatPayload = {
+          method: "POST",
+          body: JSON.stringify(requestPayload),
+          signal: controller.signal,
+          headers: headers,
+        };
         const res = await fetch(chatPath, chatPayload);
         clearTimeout(requestTimeoutId);
 
@@ -249,6 +268,7 @@ export class QwenApi implements LLMApi {
       options.onError?.(e as Error);
     }
   }
+
   async usage() {
     return {
       used: 0,
@@ -260,4 +280,5 @@ export class QwenApi implements LLMApi {
     return [];
   }
 }
+
 export { Alibaba };
