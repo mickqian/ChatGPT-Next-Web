@@ -7,6 +7,7 @@ import { getModelProvider, isModelNotavailableInServer } from "../utils/model";
 const serverConfig = getServerSideConfig();
 
 export async function requestOpenai(req: NextRequest) {
+  console.log("Request Openai");
   const controller = new AbortController();
 
   const isAzure = req.nextUrl.pathname.includes("azure/deployments");
@@ -73,6 +74,7 @@ export async function requestOpenai(req: NextRequest) {
         .filter((v) => !!v && !v.startsWith("-") && v.includes(modelName))
         .forEach((m) => {
           const [fullName, displayName] = m.split("=");
+          console.log("fullName", fullName);
           const [_, providerName] = getModelProvider(fullName);
           if (providerName === "azure" && !displayName) {
             const [_, deployId] = (serverConfig?.azureUrl ?? "").split(

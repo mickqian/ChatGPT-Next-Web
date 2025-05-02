@@ -1,8 +1,9 @@
 import { getServerSideConfig } from "@/app/config/server";
 import {
-  ALIBABA_BASE_URL,
+  ApiPath,
   ModelProvider,
   ServiceProvider,
+  VAPI_BASE_URL,
 } from "@/app/constant";
 import { prettyObject } from "@/app/utils/format";
 import { NextRequest, NextResponse } from "next/server";
@@ -15,13 +16,13 @@ export async function handle(
   req: NextRequest,
   { params }: { params: { path: string[] } },
 ) {
-  console.log("[Alibaba Route] params ", params);
+  console.log("[VAPI Route] params ", params);
 
   if (req.method === "OPTIONS") {
     return NextResponse.json({ body: "OK" }, { status: 200 });
   }
 
-  const authResult = auth(req, ModelProvider.Qwen);
+  const authResult = auth(req, ModelProvider.VAPI);
   if (authResult.error) {
     return NextResponse.json(authResult, {
       status: 401,
@@ -32,43 +33,18 @@ export async function handle(
     const response = await request(req);
     return response;
   } catch (e) {
-    console.error("[Alibaba] ", e);
+    console.error("[VAPI] ", e);
     return NextResponse.json(prettyObject(e));
   }
-}
-
-async function printReadableStream(stream: ReadableStream<Uint8Array>) {
-  const reader = stream.getReader();
-  const decoder = new TextDecoder("utf-8");
-  let result = "";
-
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) {
-        break;
-      }
-      // 将 Uint8Array 转换为字符串并累加到结果中
-      result += decoder.decode(value, { stream: true });
-    }
-  } catch (error) {
-    console.error("Error reading stream:", error);
-  } finally {
-    reader.releaseLock();
-  }
-
-  console.log("Stream content:", result);
 }
 
 async function request(req: NextRequest) {
   const controller = new AbortController();
 
   // alibaba use base url or just remove the path
-  let Alibaba_PATH = "/api/alibaba/";
+  let path = `${req.nextUrl.pathname}`.replaceAll(ApiPath.VAPI, "");
 
-  let path = `${req.nextUrl.pathname}`.replaceAll(Alibaba_PATH, "");
-  console.log("[Path] ", path);
-  let baseUrl = serverConfig.alibabaUrl || ALIBABA_BASE_URL;
+  let baseUrl = serverConfig.vapiUrl || VAPI_BASE_URL;
 
   if (!baseUrl.startsWith("http")) {
     baseUrl = `https://${baseUrl}`;
@@ -78,10 +54,8 @@ async function request(req: NextRequest) {
     baseUrl = baseUrl.slice(0, -1);
   }
 
-  console.log("[Url] ", req.nextUrl);
   console.log("[Proxy] ", path);
   console.log("[Base Url]", baseUrl);
-  // console.log("[Body]", req.body);
 
   const timeoutId = setTimeout(
     () => {
@@ -90,13 +64,11 @@ async function request(req: NextRequest) {
     10 * 60 * 1000,
   );
 
-  const fetchUrl = `${baseUrl}/${path}`;
-  console.log("[fetchUrl]", fetchUrl);
+  const fetchUrl = `${baseUrl}${path}`;
   const fetchOptions: RequestInit = {
     headers: {
       "Content-Type": "application/json",
       Authorization: req.headers.get("Authorization") ?? "",
-      "X-DashScope-SSE": req.headers.get("X-DashScope-SSE") ?? "disable",
     },
     method: req.method,
     body: req.body,
@@ -105,12 +77,6 @@ async function request(req: NextRequest) {
     duplex: "half",
     signal: controller.signal,
   };
-
-  // console.log(util.inspect(fetchOptions, { showHidden: true, depth: null, colors: true }));
-
-  // console.log("[fetchOptions]", JSON.stringify(fetchOptions));
-  // console.log("[req]", JSON.stringify(req));
-  // console.log("[serverConfig.customModels] ", serverConfig.customModels);
 
   // #1815 try to refuse some request to some models
   if (serverConfig.customModels && req.body) {
@@ -125,7 +91,7 @@ async function request(req: NextRequest) {
         isModelNotavailableInServer(
           serverConfig.customModels,
           jsonBody?.model as string,
-          ServiceProvider.Alibaba as string,
+          ServiceProvider.VAPI as string,
         )
       ) {
         return NextResponse.json(
@@ -139,15 +105,10 @@ async function request(req: NextRequest) {
         );
       }
     } catch (e) {
-      console.error(`[Alibaba] filter`, e);
+      console.error(`[VAPI] filter`, e);
     }
   }
   try {
-    console.log("[body]", JSON.stringify(fetchOptions.body));
-    // console.log("[body]", fetchOptions);
-
-    // printReadableStream(fetchOptions.body)
-
     const res = await fetch(fetchUrl, fetchOptions);
 
     // to prevent browser prompt for credentials

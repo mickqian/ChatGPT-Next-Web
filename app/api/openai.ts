@@ -59,6 +59,7 @@ export async function handle(
   }
 
   console.log("[Url] ", req.nextUrl);
+  console.log("Using openai api");
 
   try {
     const response = await requestOpenai(req);

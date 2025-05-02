@@ -1,6 +1,7 @@
 import { ApiPath } from "@/app/constant";
 import { NextRequest } from "next/server";
 import { handle as openaiHandler } from "../../openai";
+import { handle as vapiHandler } from "../../vapi";
 import { handle as azureHandler } from "../../azure";
 import { handle as googleHandler } from "../../google";
 import { handle as anthropicHandler } from "../../anthropic";
@@ -52,6 +53,8 @@ async function handle(
       return siliconflowHandler(req, { params });
     case ApiPath.OpenAI:
       return openaiHandler(req, { params });
+    case ApiPath.VAPI:
+      return vapiHandler(req, { params });
     default:
       return proxyHandler(req, { params });
   }

@@ -12,6 +12,7 @@ export const RUNTIME_CONFIG_DOM = "danger-runtime-config";
 export const STABILITY_BASE_URL = "https://api.stability.ai";
 
 export const OPENAI_BASE_URL = "https://api.openai.com";
+export const VAPI_BASE_URL = "https://api.gpt.ge";
 export const ANTHROPIC_BASE_URL = "https://api.anthropic.com";
 
 export const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/";
@@ -73,6 +74,7 @@ export enum ApiPath {
   ChatGLM = "/api/chatglm",
   DeepSeek = "/api/deepseek",
   SiliconFlow = "/api/siliconflow",
+  VAPI = "/api/vapi",
 }
 
 export enum SlotID {
@@ -131,6 +133,7 @@ export enum ServiceProvider {
   ChatGLM = "ChatGLM",
   DeepSeek = "DeepSeek",
   SiliconFlow = "SiliconFlow",
+  VAPI = "VAPI",
 }
 
 // Google API safety settings, see https://ai.google.dev/gemini-api/docs/safety-settings
@@ -157,6 +160,7 @@ export enum ModelProvider {
   ChatGLM = "ChatGLM",
   DeepSeek = "DeepSeek",
   SiliconFlow = "SiliconFlow",
+  VAPI = "VAPI",
 }
 
 export const Stability = {
@@ -172,6 +176,15 @@ export const Anthropic = {
 };
 
 export const OpenaiPath = {
+  ChatPath: "v1/chat/completions",
+  SpeechPath: "v1/audio/speech",
+  ImagePath: "v1/images/generations",
+  UsagePath: "dashboard/billing/usage",
+  SubsPath: "dashboard/billing/subscription",
+  ListModelPath: "v1/models",
+};
+
+export const VAPIPath = {
   ChatPath: "v1/chat/completions",
   SpeechPath: "v1/audio/speech",
   ImagePath: "v1/images/generations",
@@ -602,6 +615,16 @@ const baiduModels = [
   "ernie-tiny-8k",
 ];
 
+const vapiModels = [
+  "gpt-4o",
+  "gpt-4.1",
+  "deepseek-r1",
+  "claude-3-7-sonnet-20250219-thinking",
+  "claude-3-7-sonnet-20250219-all",
+  "grok-3-beta",
+  "grok-3-beta",
+];
+
 const bytedanceModels = [
   "Doubao-lite-4k",
   "Doubao-lite-32k",
@@ -620,9 +643,9 @@ const alibabaModes = [
   // "qwen-max-0403",
   // "qwen-max-0107",
   // "qwen-max-longcontext",
-  "qwen-omni-turbo",
-  "qwen-vl-plus",
-  "qwen-vl-max",
+  // "qwen-omni-turbo",
+  // "qwen-vl-plus",
+  // "qwen-vl-max",
 ];
 
 const tencentModels = [
@@ -697,28 +720,17 @@ const siliconflowModels = [
 
 let seq = 1000; // 内置的模型序号生成器从1000开始
 export const DEFAULT_MODELS = [
-  ...deepseekModels.map((name) => ({
-    name,
-    available: true,
-    sorted: seq++,
-    provider: {
-      id: "deepseek",
-      providerName: "DeepSeek",
-      providerType: "deepseek",
-      sorted: 13,
-    },
-  })),
-  ...openaiModels.map((name) => ({
-    name,
-    available: true,
-    sorted: seq++, // Global sequence sort(index)
-    provider: {
-      id: "openai",
-      providerName: "OpenAI",
-      providerType: "openai",
-      sorted: 1, // 这里是固定的，确保顺序与之前内置的版本一致
-    },
-  })),
+  // ...openaiModels.map((name) => ({
+  //   name,
+  //   available: true,
+  //   sorted: seq++, // Global sequence sort(index)
+  //   provider: {
+  //     id: "openai",
+  //     providerName: "OpenAI",
+  //     providerType: "openai",
+  //     sorted: 1, // 这里是固定的，确保顺序与之前内置的版本一致
+  //   },
+  // })),
   // ...openaiModels.map((name) => ({
   //   name,
   //   available: true,
@@ -730,28 +742,40 @@ export const DEFAULT_MODELS = [
   //     sorted: 2,
   //   },
   // })),
-  ...googleModels.map((name) => ({
+  // ...googleModels.map((name) => ({
+  //   name,
+  //   available: true,
+  //   sorted: seq++,
+  //   provider: {
+  //     id: "google",
+  //     providerName: "Google",
+  //     providerType: "google",
+  //     sorted: 3,
+  //   },
+  // })),
+  // ...anthropicModels.map((name) => ({
+  //   name,
+  //   available: true,
+  //   sorted: seq++,
+  //   provider: {
+  //     id: "anthropic",
+  //     providerName: "Anthropic",
+  //     providerType: "anthropic",
+  //     sorted: 4,
+  //   },
+  // })),
+  ...vapiModels.map((name) => ({
     name,
     available: true,
     sorted: seq++,
     provider: {
-      id: "google",
-      providerName: "Google",
-      providerType: "google",
-      sorted: 3,
+      id: "vapi",
+      providerName: "VAPI",
+      providerType: "vapi",
+      sorted: 5,
     },
   })),
-  ...anthropicModels.map((name) => ({
-    name,
-    available: true,
-    sorted: seq++,
-    provider: {
-      id: "anthropic",
-      providerName: "Anthropic",
-      providerType: "anthropic",
-      sorted: 4,
-    },
-  })),
+
   // ...baiduModels.map((name) => ({
   //   name,
   //   available: true,
@@ -774,17 +798,17 @@ export const DEFAULT_MODELS = [
   //     sorted: 6,
   //   },
   // })),
-  ...alibabaModes.map((name) => ({
-    name,
-    available: true,
-    sorted: seq++,
-    provider: {
-      id: "alibaba",
-      providerName: "Alibaba",
-      providerType: "alibaba",
-      sorted: 7,
-    },
-  })),
+  // ...alibabaModes.map((name) => ({
+  //   name,
+  //   available: true,
+  //   sorted: seq++,
+  //   provider: {
+  //     id: "alibaba",
+  //     providerName: "Alibaba",
+  //     providerType: "alibaba",
+  //     sorted: 7,
+  //   },
+  // })),
   // ...tencentModels.map((name) => ({
   //   name,
   //   available: true,
@@ -860,6 +884,17 @@ export const DEFAULT_MODELS = [
   //     providerName: "SiliconFlow",
   //     providerType: "siliconflow",
   //     sorted: 14,
+  //   },
+  // })),
+  // ...deepseekModels.map((name) => ({
+  //   name,
+  //   available: true,
+  //   sorted: seq++,
+  //   provider: {
+  //     id: "deepseek",
+  //     providerName: "DeepSeek",
+  //     providerType: "deepseek",
+  //     sorted: 13,
   //   },
   // })),
 ] as const;

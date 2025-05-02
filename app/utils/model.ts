@@ -210,6 +210,7 @@ export function isModelAvailableInServer(
  * @returns True if the model is a GPT-4 related model (excluding gpt-4o-mini)
  */
 export function isGPT4Model(modelName: string): boolean {
+  console.log("isGPT4Model");
   return (
     (modelName.startsWith("gpt-4") ||
       modelName.startsWith("chatgpt-4o") ||

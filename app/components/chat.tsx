@@ -1222,7 +1222,6 @@ function _Chat() {
     // 4. resend the user's input
 
     console.log("[message], ", message);
-
     const resendingIndex = session.messages.findIndex(
       (m) => m.id === message.id,
     );

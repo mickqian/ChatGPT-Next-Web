@@ -163,6 +163,8 @@ export const getServerSideConfig = () => {
   const isXAI = !!process.env.XAI_API_KEY;
   const isChatGLM = !!process.env.CHATGLM_API_KEY;
   const isSiliconFlow = !!process.env.SILICONFLOW_API_KEY;
+
+  const isVAPI = !!process.env.VAPI_API_KEY;
   // const apiKeyEnvVar = process.env.OPENAI_API_KEY ?? "";
   // const apiKeys = apiKeyEnvVar.split(",").map((v) => v.trim());
   // const randomIndex = Math.floor(Math.random() * apiKeys.length);
@@ -241,6 +243,10 @@ export const getServerSideConfig = () => {
     cloudflareKVNamespaceId: process.env.CLOUDFLARE_KV_NAMESPACE_ID,
     cloudflareKVApiKey: getApiKey(process.env.CLOUDFLARE_KV_API_KEY),
     cloudflareKVTTL: process.env.CLOUDFLARE_KV_TTL,
+
+    isVAPI,
+    vapiUrl: process.env.VAPI_URL,
+    vapiApiKey: getApiKey(process.env.VAPI_API_KEY),
 
     isSiliconFlow,
     siliconFlowUrl: process.env.SILICONFLOW_URL,

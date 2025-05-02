@@ -455,10 +455,11 @@ export const useChatStore = createPersistStore(
             botMessage,
           ]);
         });
-
+        console.log("Chat useChatStore");
         const api: ClientApi = getClientApi(modelConfig.providerName);
         // make request
         console.log("[Messages], ", sendMessages);
+
         api.llm.chat({
           messages: sendMessages,
           config: { ...modelConfig, stream: true },

@@ -1,10 +1,10 @@
 "use client";
-// azure and openai, using same models. so using same LLMApi.
+// azure and VAPI, using same models. so using same LLMApi.
 import {
   ApiPath,
-  OPENAI_BASE_URL,
+  VAPI_BASE_URL,
   DEFAULT_MODELS,
-  OpenaiPath,
+  VAPIPath,
   Azure,
   REQUEST_TIMEOUT_MS,
   ServiceProvider,
@@ -45,7 +45,7 @@ import {
 } from "@/app/utils";
 import { fetch } from "@/app/utils/stream";
 
-export interface OpenAIListModelResponse {
+export interface VAPIListModelResponse {
   object: string;
   data: Array<{
     id: string;
@@ -79,7 +79,7 @@ export interface DalleRequestPayload {
   style: DalleStyle;
 }
 
-export class ChatGPTApi implements LLMApi {
+export class VAPIApi implements LLMApi {
   private disableListModels = true;
 
   path(path: string): string {
@@ -95,13 +95,13 @@ export class ChatGPTApi implements LLMApi {
         );
       }
 
-      baseUrl = isAzure ? accessStore.azureUrl : accessStore.openaiUrl;
+      baseUrl = isAzure ? accessStore.azureUrl : accessStore.vapiUrl;
     }
 
     if (baseUrl.length === 0) {
       const isApp = !!getClientConfig()?.isApp;
-      const apiPath = isAzure ? ApiPath.Azure : ApiPath.OpenAI;
-      baseUrl = isApp ? OPENAI_BASE_URL : apiPath;
+      const apiPath = isAzure ? ApiPath.Azure : ApiPath.VAPI;
+      baseUrl = isApp ? VAPI_BASE_URL : apiPath;
     }
 
     if (baseUrl.endsWith("/")) {
@@ -110,7 +110,7 @@ export class ChatGPTApi implements LLMApi {
     if (
       !baseUrl.startsWith("http") &&
       !isAzure &&
-      !baseUrl.startsWith(ApiPath.OpenAI)
+      !baseUrl.startsWith(ApiPath.VAPI)
     ) {
       baseUrl = "https://" + baseUrl;
     }
@@ -154,13 +154,13 @@ export class ChatGPTApi implements LLMApi {
       speed: options.speed,
     };
 
-    console.log("[Request] openai speech payload: ", requestPayload);
+    console.log("[Request] VAPI speech payload: ", requestPayload);
 
     const controller = new AbortController();
     options.onController?.(controller);
 
     try {
-      const speechPath = this.path(OpenaiPath.SpeechPath);
+      const speechPath = this.path(VAPIPath.SpeechPath);
       const speechPayload = {
         method: "POST",
         body: JSON.stringify(requestPayload),
@@ -184,8 +184,6 @@ export class ChatGPTApi implements LLMApi {
   }
 
   async chat(options: ChatOptions) {
-    console.log("[OPENAI CHAT]");
-
     const modelConfig = {
       ...useAppConfig.getState().modelConfig,
       ...useChatStore.getState().currentSession().mask.modelConfig,
@@ -200,8 +198,7 @@ export class ChatGPTApi implements LLMApi {
     const isDalle3 = _isDalle3(options.config.model);
     const isO1OrO3 =
       options.config.model.startsWith("o1") ||
-      options.config.model.startsWith("o3") ||
-      options.config.model.startsWith("o4-mini");
+      options.config.model.startsWith("o3");
     if (isDalle3) {
       const prompt = getMessageTextContent(
         options.messages.slice(-1)?.pop() as any,
@@ -240,18 +237,18 @@ export class ChatGPTApi implements LLMApi {
         // Please do not ask me why not send max_tokens, no reason, this param is just shit, I dont want to explain anymore.
       };
 
-      // O1 使用 max_completion_tokens 控制token数 (https://platform.openai.com/docs/guides/reasoning#controlling-costs)
+      // O1 使用 max_completion_tokens 控制token数 (https://platform.VAPI.com/docs/guides/reasoning#controlling-costs)
       if (isO1OrO3) {
         requestPayload["max_completion_tokens"] = modelConfig.max_tokens;
       }
 
       // add max_tokens to vision model
-      if (visionModel && !isO1OrO3) {
+      if (visionModel) {
         requestPayload["max_tokens"] = Math.max(modelConfig.max_tokens, 4000);
       }
     }
 
-    console.log("[Request] openai payload: ", requestPayload);
+    console.log("[Request] VAPI payload: ", requestPayload);
 
     const shouldStream = !isDalle3 && !!options.config.stream;
     const controller = new AbortController();
@@ -285,9 +282,7 @@ export class ChatGPTApi implements LLMApi {
           ),
         );
       } else {
-        chatPath = this.path(
-          isDalle3 ? OpenaiPath.ImagePath : OpenaiPath.ChatPath,
-        );
+        chatPath = this.path(isDalle3 ? VAPIPath.ImagePath : VAPIPath.ChatPath);
       }
       if (shouldStream) {
         let index = -1;
@@ -429,14 +424,14 @@ export class ChatGPTApi implements LLMApi {
     const [used, subs] = await Promise.all([
       fetch(
         this.path(
-          `${OpenaiPath.UsagePath}?start_date=${startDate}&end_date=${endDate}`,
+          `${VAPIPath.UsagePath}?start_date=${startDate}&end_date=${endDate}`,
         ),
         {
           method: "GET",
           headers: getHeaders(),
         },
       ),
-      fetch(this.path(OpenaiPath.SubsPath), {
+      fetch(this.path(VAPIPath.SubsPath), {
         method: "GET",
         headers: getHeaders(),
       }),
@@ -447,7 +442,7 @@ export class ChatGPTApi implements LLMApi {
     }
 
     if (!used.ok || !subs.ok) {
-      throw new Error("Failed to query usage from openai");
+      throw new Error("Failed to query usage from VAPI");
     }
 
     const response = (await used.json()) as {
@@ -485,14 +480,14 @@ export class ChatGPTApi implements LLMApi {
       return DEFAULT_MODELS.slice();
     }
 
-    const res = await fetch(this.path(OpenaiPath.ListModelPath), {
+    const res = await fetch(this.path(VAPIPath.ListModelPath), {
       method: "GET",
       headers: {
         ...getHeaders(),
       },
     });
 
-    const resJson = (await res.json()) as OpenAIListModelResponse;
+    const resJson = (await res.json()) as VAPIListModelResponse;
     const chatModels = resJson.data?.filter(
       (m) => m.id.startsWith("gpt-") || m.id.startsWith("chatgpt-"),
     );
@@ -502,19 +497,19 @@ export class ChatGPTApi implements LLMApi {
       return [];
     }
 
-    //由于目前 OpenAI 的 disableListModels 默认为 true，所以当前实际不会运行到这场
+    //由于目前 VAPI 的 disableListModels 默认为 true，所以当前实际不会运行到这场
     let seq = 1000; //同 Constant.ts 中的排序保持一致
     return chatModels.map((m) => ({
       name: m.id,
       available: true,
       sorted: seq++,
       provider: {
-        id: "openai",
-        providerName: "OpenAI",
-        providerType: "openai",
+        id: "VAPI",
+        providerName: "VAPI",
+        providerType: "VAPI",
         sorted: 1,
       },
     }));
   }
 }
-export { OpenaiPath };
+export { VAPIPath };

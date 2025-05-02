@@ -65,6 +65,7 @@ export function auth(req: NextRequest, modelProvider: ModelProvider) {
     //     : serverConfig.apiKey;
 
     let systemApiKey: string | undefined;
+    console.log("Model Provider", modelProvider);
 
     switch (modelProvider) {
       case ModelProvider.Stability:
@@ -94,6 +95,9 @@ export function auth(req: NextRequest, modelProvider: ModelProvider) {
         break;
       case ModelProvider.DeepSeek:
         systemApiKey = serverConfig.deepseekApiKey;
+        break;
+      case ModelProvider.VAPI:
+        systemApiKey = serverConfig.vapiApiKey;
         break;
       case ModelProvider.XAI:
         systemApiKey = serverConfig.xaiApiKey;

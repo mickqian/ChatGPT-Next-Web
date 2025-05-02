@@ -13,6 +13,7 @@ import {
 } from "../store";
 import { ChatGPTApi, DalleRequestPayload } from "./platforms/openai";
 import { GeminiProApi } from "./platforms/google";
+import { VAPIApi } from "./platforms/vapi";
 import { ClaudeApi } from "./platforms/anthropic";
 import { ErnieApi } from "./platforms/baidu";
 import { DoubaoApi } from "./platforms/bytedance";
@@ -136,6 +137,7 @@ export class ClientApi {
   public llm: LLMApi;
 
   constructor(provider: ModelProvider = ModelProvider.GPT) {
+    console.log("provider!!!!!", provider);
     switch (provider) {
       case ModelProvider.GeminiPro:
         this.llm = new GeminiProApi();
@@ -172,6 +174,9 @@ export class ClientApi {
         break;
       case ModelProvider.SiliconFlow:
         this.llm = new SiliconflowApi();
+        break;
+      case ModelProvider.VAPI:
+        this.llm = new VAPIApi();
         break;
       default:
         this.llm = new ChatGPTApi();
@@ -263,6 +268,7 @@ export function getHeaders(ignoreHeaders: boolean = false) {
     const isDeepSeek = modelConfig.providerName === ServiceProvider.DeepSeek;
     const isXAI = modelConfig.providerName === ServiceProvider.XAI;
     const isChatGLM = modelConfig.providerName === ServiceProvider.ChatGLM;
+    const isVAPI = modelConfig.providerName === ServiceProvider.VAPI;
     const isSiliconFlow =
       modelConfig.providerName === ServiceProvider.SiliconFlow;
     const isEnabledAccessControl = accessStore.enabledAccessControl();
@@ -282,6 +288,8 @@ export function getHeaders(ignoreHeaders: boolean = false) {
       ? accessStore.xaiApiKey
       : isDeepSeek
       ? accessStore.deepseekApiKey
+      : isVAPI
+      ? accessStore.vapiApiKey
       : isChatGLM
       ? accessStore.chatglmApiKey
       : isSiliconFlow
@@ -382,7 +390,10 @@ export function getClientApi(provider: ServiceProvider): ClientApi {
       return new ClientApi(ModelProvider.ChatGLM);
     case ServiceProvider.SiliconFlow:
       return new ClientApi(ModelProvider.SiliconFlow);
+    case ServiceProvider.VAPI:
+      return new ClientApi(ModelProvider.VAPI);
     default:
+      console.log("!!!Fallback to GPT");
       return new ClientApi(ModelProvider.GPT);
   }
 }
