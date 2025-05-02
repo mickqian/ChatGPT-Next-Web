@@ -1237,6 +1237,22 @@ export function Settings() {
           }}
         />
       </ListItem>
+      <ListItem
+        title={Locale.Settings.Access.VAPI.ApiKey.Title}
+        subTitle={Locale.Settings.Access.VAPI.ApiKey.SubTitle}
+      >
+        <PasswordInput
+          aria-label={Locale.Settings.Access.VAPI.ApiKey.Title}
+          value={accessStore.vapiApiKey}
+          type="text"
+          placeholder={Locale.Settings.Access.VAPI.ApiKey.Placeholder}
+          onChange={(e) => {
+            accessStore.update(
+              (access) => (access.vapiApiKey = e.currentTarget.value),
+            );
+          }}
+        />
+      </ListItem>
     </>
   );
 

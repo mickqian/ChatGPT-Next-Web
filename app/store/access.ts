@@ -213,6 +213,9 @@ export const useAccessStore = createPersistStore(
     isValidDeepSeek() {
       return ensure(get(), ["deepseekApiKey"]);
     },
+    isValidVAPI() {
+      return ensure(get(), ["vapiApiKey"]);
+    },
 
     isValidXAI() {
       return ensure(get(), ["xaiApiKey"]);
@@ -242,6 +245,7 @@ export const useAccessStore = createPersistStore(
         this.isValidMoonshot() ||
         this.isValidIflytek() ||
         this.isValidDeepSeek() ||
+        this.isValidVAPI() ||
         this.isValidXAI() ||
         this.isValidChatGLM() ||
         this.isValidSiliconFlow() ||

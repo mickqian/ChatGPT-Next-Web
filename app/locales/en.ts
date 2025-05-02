@@ -458,6 +458,17 @@ const en: LocaleType = {
           SubTitle: "Example: ",
         },
       },
+      VAPI: {
+        ApiKey: {
+          Title: "VAPI API Key",
+          SubTitle: "Use a custom VAPI API Key",
+          Placeholder: "VAPI API Key",
+        },
+        Endpoint: {
+          Title: "Endpoint Address",
+          SubTitle: "Example: ",
+        },
+      },
       XAI: {
         ApiKey: {
           Title: "XAI API Key",

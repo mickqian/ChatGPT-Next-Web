@@ -59,6 +59,10 @@ declare global {
       ALIBABA_URL?: string;
       ALIBABA_API_KEY?: string;
 
+      // vapi only
+      VAPI_URL?: string;
+      VAPI_API_KEY?: string;
+
       // tencent only
       TENCENT_URL?: string;
       TENCENT_SECRET_KEY?: string;
@@ -110,6 +114,7 @@ const ACCESS_CODES = (function getAccessCodes(): Set<string> {
 })();
 
 function getApiKey(keys?: string) {
+  console.log("[API KEYS]", keys);
   const apiKeyEnvVar = keys ?? "";
   const apiKeys = apiKeyEnvVar.split(",").map((v) => v.trim());
   const randomIndex = Math.floor(Math.random() * apiKeys.length);
@@ -163,7 +168,6 @@ export const getServerSideConfig = () => {
   const isXAI = !!process.env.XAI_API_KEY;
   const isChatGLM = !!process.env.CHATGLM_API_KEY;
   const isSiliconFlow = !!process.env.SILICONFLOW_API_KEY;
-
   const isVAPI = !!process.env.VAPI_API_KEY;
   // const apiKeyEnvVar = process.env.OPENAI_API_KEY ?? "";
   // const apiKeys = apiKeyEnvVar.split(",").map((v) => v.trim());
