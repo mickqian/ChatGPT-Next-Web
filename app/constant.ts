@@ -618,10 +618,12 @@ const baiduModels = [
 const vapiModels = [
   "gpt-4o",
   "gpt-4.1",
+  "o1",
+  "o3-mini",
+  "o4-mini",
   "deepseek-r1",
   "claude-3-7-sonnet-20250219-thinking",
   "claude-3-7-sonnet-20250219-all",
-  "grok-3-beta",
   "grok-3-beta",
 ];
 
