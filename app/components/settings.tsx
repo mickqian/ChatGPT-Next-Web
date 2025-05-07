@@ -75,6 +75,7 @@ import {
   ChatGLM,
   DeepSeek,
   SiliconFlow,
+  VAPI,
 } from "../constant";
 import { Prompt, SearchService, usePromptStore } from "../store/prompt";
 import { ErrorBoundary } from "./error";
@@ -1237,6 +1238,29 @@ export function Settings() {
           }}
         />
       </ListItem>
+    </>
+  );
+
+  const vapiConfigComponent = accessStore.provider === ServiceProvider.VAPI && (
+    <>
+      <ListItem
+        title={Locale.Settings.Access.VAPI.Endpoint.Title}
+        subTitle={
+          Locale.Settings.Access.VAPI.Endpoint.SubTitle + VAPI.ExampleEndpoint
+        }
+      >
+        <input
+          aria-label={Locale.Settings.Access.VAPI.Endpoint.Title}
+          type="text"
+          value={accessStore.vapiUrl}
+          placeholder={VAPI.ExampleEndpoint}
+          onChange={(e) =>
+            accessStore.update(
+              (access) => (access.vapiUrl = e.currentTarget.value),
+            )
+          }
+        ></input>
+      </ListItem>
       <ListItem
         title={Locale.Settings.Access.VAPI.ApiKey.Title}
         subTitle={Locale.Settings.Access.VAPI.ApiKey.SubTitle}
@@ -1833,6 +1857,7 @@ export function Settings() {
                   {tencentConfigComponent}
                   {moonshotConfigComponent}
                   {deepseekConfigComponent}
+                  {vapiConfigComponent}
                   {stabilityConfigComponent}
                   {lflytekConfigComponent}
                   {XAIConfigComponent}

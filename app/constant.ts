@@ -279,6 +279,11 @@ export const DeepSeek = {
   ChatPath: "chat/completions",
 };
 
+export const VAPI = {
+  ExampleEndpoint: VAPI_BASE_URL,
+  ChatPath: "v1/chat/completions",
+};
+
 export const XAI = {
   ExampleEndpoint: XAI_BASE_URL,
   ChatPath: "v1/chat/completions",

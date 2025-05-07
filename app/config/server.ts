@@ -1,5 +1,5 @@
 import md5 from "spark-md5";
-import { DEFAULT_MODELS, DEFAULT_GA_ID } from "../constant";
+import { DEFAULT_GA_ID, DEFAULT_MODELS } from "../constant";
 import { isGPT4Model } from "../utils/model";
 
 declare global {
@@ -177,6 +177,7 @@ export const getServerSideConfig = () => {
   //   `[Server Config] using ${randomIndex + 1} of ${apiKeys.length} api key`,
   // );
 
+  console.log("VAPI API KEY", process.env.VAPI_API_KEY);
   const allowedWebDavEndpoints = (
     process.env.WHITE_WEBDAV_ENDPOINTS ?? ""
   ).split(",");

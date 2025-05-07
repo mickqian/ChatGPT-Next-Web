@@ -39,6 +39,7 @@ export async function handle(
 }
 
 async function request(req: NextRequest) {
+  console.log("Request vapi");
   const controller = new AbortController();
 
   // alibaba use base url or just remove the path

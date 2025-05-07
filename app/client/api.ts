@@ -299,6 +299,8 @@ export function getHeaders(ignoreHeaders: boolean = false) {
         ? accessStore.iflytekApiKey + ":" + accessStore.iflytekApiSecret
         : ""
       : accessStore.openaiApiKey;
+
+    console.log("[VAPI API KEY]", apiKey);
     return {
       isGoogle,
       isAzure,
@@ -312,6 +314,7 @@ export function getHeaders(ignoreHeaders: boolean = false) {
       isXAI,
       isChatGLM,
       isSiliconFlow,
+      isVAPI,
       apiKey,
       isEnabledAccessControl,
     };
