@@ -626,6 +626,9 @@ const vapiModels = [
   "o1",
   "o3-mini",
   "o4-mini",
+  "ge-2.5-pro-preview-03-25",
+  "ge-2.5-pro-preview-05-06",
+  "gemini-2.5-pro-exp-03-25",
   "deepseek-r1",
   "claude-3-7-sonnet-20250219-thinking",
   "claude-3-7-sonnet-20250219-all",
@@ -779,7 +782,7 @@ export const DEFAULT_MODELS = [
       id: "vapi",
       providerName: "VAPI",
       providerType: "vapi",
-      sorted: 5,
+      sorted: 0,
     },
   })),
 
